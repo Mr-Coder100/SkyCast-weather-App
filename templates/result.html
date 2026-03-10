@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data.city }} Weather - SkyCast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            padding: 30px 20px 60px;
+        }
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        .blob-1 { width: 500px; height: 500px; background: #4facfe; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #a18cd1; bottom: -100px; right: -100px; }
+
+        .wrapper {
+            max-width: 900px;
+            margin: auto;
+            animation: fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 800;
+            color: #4facfe;
+            text-decoration: none;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover { background: rgba(79,172,254,0.2); border-color: #4facfe; }
+
+        /* Main Card */
+        .main-card {
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 28px;
+            padding: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .city-info h2 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .city-info .country {
+            color: rgba(255,255,255,0.5);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .city-info .desc {
+            color: #4facfe;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .temp-display {
+            text-align: center;
+        }
+
+        .temp-display .icon {
+            font-size: 80px;
+            line-height: 1;
+        }
+
+        .temp-display .temp {
+            font-size: 80px;
+            font-weight: 800;
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .temp-display .feels {
+            color: rgba(255,255,255,0.5);
+            font-size: 15px;
+            margin-top: 5px;
+        }
+
+        .temp-range {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .temp-range span {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .temp-max { background: rgba(255,100,100,0.2); color: #ff8080; }
+        .temp-min { background: rgba(100,180,255,0.2); color: #80c0ff; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px;
+            padding: 22px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover { transform: translateY(-4px); }
+
+        .stat-card .icon { font-size: 28px; margin-bottom: 8px; }
+        .stat-card .label { color: rgba(255,255,255,0.45); font-size: 13px; margin-bottom: 5px; }
+        .stat-card .value { font-size: 22px; font-weight: 700; color: #fff; }
+        .stat-card .unit { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+        /* Sun card */
+        .sun-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px;
+            padding: 22px 30px;
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .sun-item { text-align: center; }
+        .sun-item .icon { font-size: 32px; margin-bottom: 6px; }
+        .sun-item .label { color: rgba(255,255,255,0.45); font-size: 13px; }
+        .sun-item .time { font-size: 20px; font-weight: 700; }
+
+        /* Forecast */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .forecast-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .forecast-card:hover {
+            background: rgba(79,172,254,0.1);
+            border-color: rgba(79,172,254,0.3);
+            transform: translateY(-3px);
+        }
+
+        .forecast-card .day { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+        .forecast-card .f-icon { font-size: 30px; margin-bottom: 8px; }
+        .forecast-card .f-desc { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+        .forecast-card .f-temps { display: flex; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; }
+        .f-max { color: #ff8080; }
+        .f-min { color: #80c0ff; }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="wrapper">
+        <div class="top-bar">
+            <a href="/" class="brand">🌤️ SkyCast</a>
+            <a href="/" class="back-btn">← Search Again</a>
+        </div>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <div class="city-info">
+                <div class="country">📍 {{ data.country }}</div>
+                <h2>{{ data.city }}</h2>
+                <div class="desc">{{ data.description }}</div>
+                <div class="temp-range">
+                    <span class="temp-max">↑ {{ data.temp_max }}°C</span>
+                    <span class="temp-min">↓ {{ data.temp_min }}°C</span>
+                </div>
+            </div>
+            <div class="temp-display">
+                <div class="icon">
+                    <img src="https://openweathermap.org/img/wn/{{ data.icon }}@2x.png" style="width:80px;">
+                </div>
+                <div class="temp">{{ data.temp }}°</div>
+                <div class="feels">Feels like {{ data.feels_like }}°C</div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">💧</div>
+                <div class="label">Humidity</div>
+                <div class="value">{{ data.humidity }}<span class="unit">%</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">💨</div>
+                <div class="label">Wind Speed</div>
+                <div class="value">{{ data.wind_speed }}<span class="unit"> m/s</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🔵</div>
+                <div class="label">Pressure</div>
+                <div class="value">{{ data.pressure }}<span class="unit"> hPa</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">☁️</div>
+                <div class="label">Cloud Cover</div>
+                <div class="value">{{ data.clouds }}<span class="unit">%</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">👁️</div>
+                <div class="label">Visibility</div>
+                <div class="value">{{ data.visibility }}<span class="unit"> km</span></div>
+            </div>
+        </div>
+
+        <!-- Sunrise/Sunset -->
+        <div class="sun-card">
+            <div class="sun-item">
+                <div class="icon">🌅</div>
+                <div class="label">Sunrise</div>
+                <div class="time">{{ data.sunrise }}</div>
+            </div>
+            <div class="sun-item">
+                <div class="icon">🌇</div>
+                <div class="label">Sunset</div>
+                <div class="time">{{ data.sunset }}</div>
+            </div>
+        </div>
+
+        <!-- 5-Day Forecast -->
+        <div class="section-title">📅 5-Day Forecast</div>
+        <div class="forecast-grid">
+            {% for day in data.forecast %}
+            <div class="forecast-card">
+                <div class="day">{{ day.date }}</div>
+                <div class="f-icon">
+                    <img src="https://openweathermap.org/img/wn/{{ day.icon }}.png" style="width:40px;">
+                </div>
+                <div class="f-desc">{{ day.description }}</div>
+                <div class="f-temps">
+                    <span class="f-max">{{ day.temp_max | round | int }}°</span>
+                    <span class="f-min">{{ day.temp_min | round | int }}°</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

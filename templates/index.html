@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast - Weather App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated background blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 8s ease-in-out infinite;
+        }
+        .blob-1 { width: 500px; height: 500px; background: #4facfe; top: -100px; left: -100px; animation-delay: 0s; }
+        .blob-2 { width: 400px; height: 400px; background: #a18cd1; bottom: -100px; right: -100px; animation-delay: 3s; }
+        .blob-3 { width: 300px; height: 300px; background: #fbc2eb; top: 50%; left: 50%; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            padding: 40px;
+            animation: fadeUp 0.8s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 10px;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            font-size: 56px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -2px;
+            margin-bottom: 8px;
+        }
+
+        h1 span { color: #4facfe; }
+
+        .subtitle {
+            color: rgba(255,255,255,0.5);
+            font-size: 18px;
+            font-weight: 300;
+            margin-bottom: 50px;
+        }
+
+        .search-box {
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 480px;
+            margin: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .input-wrap {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 18px 24px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 17px;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-wrap input::placeholder { color: rgba(255,255,255,0.35); }
+
+        .input-wrap input:focus {
+            border-color: #4facfe;
+            background: rgba(79,172,254,0.1);
+            box-shadow: 0 0 0 3px rgba(79,172,254,0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border: none;
+            border-radius: 14px;
+            color: #0f0c29;
+            font-size: 17px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79,172,254,0.4);
+        }
+
+        .error {
+            background: rgba(255,80,80,0.15);
+            border: 1px solid rgba(255,80,80,0.3);
+            border-radius: 10px;
+            padding: 12px;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .popular {
+            margin-top: 30px;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+        }
+
+        .popular span {
+            color: #4facfe;
+            cursor: pointer;
+            margin: 0 6px;
+            transition: color 0.2s;
+        }
+
+        .popular span:hover { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="container">
+        <div class="logo">🌤️</div>
+        <h1>Sky<span>Cast</span></h1>
+        <p class="subtitle">Real-time weather forecasts for any city</p>
+
+        <div class="search-box">
+            {% if error %}
+            <div class="error">⚠️ {{ error }}</div>
+            {% endif %}
+
+            <form method="POST" action="/result">
+                <div class="input-wrap">
+                    <input type="text" name="location" placeholder="Enter city name..." required autofocus>
+                </div>
+                <button type="submit">🔍 Get Weather</button>
+            </form>
+
+            <div class="popular">
+                Try: 
+                <span onclick="document.querySelector('input').value='Delhi'">Delhi</span>
+                <span onclick="document.querySelector('input').value='Mumbai'">Mumbai</span>
+                <span onclick="document.querySelector('input').value='London'">London</span>
+                <span onclick="document.querySelector('input').value='New York'">New York</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
