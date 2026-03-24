@@ -3,7 +3,12 @@ from weather import Weather, WeatherException
 import os
 
 app = Flask(__name__)
-app.config.from_pyfile('config/config.cfg')
+# app.config.from_pyfile('config/config.cfg')
+
+
+
+app.config['API_KEY'] = os.environ.get('API_KEY')
+app.config['API_URL'] = 'http://api.openweathermap.org/data/2.5/forecast'
 w = Weather(app.config)
 
 @app.route('/')
